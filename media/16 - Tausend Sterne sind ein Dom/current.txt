@@ -1,0 +1,1 @@
+﻿Add this file to a song folder to add the label "Current" to the song, which means that the song is also displayed in the Currents area.

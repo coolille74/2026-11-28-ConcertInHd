@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title></title> <!-- Wird dynamisch gesetzt -->
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --button-bg: #f0f0f0;
+      --button-text: #000000;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f5f5f5;
+      --button-bg: #333333;
+      --button-text: #ffffff;
+    }
+
+    body {
+      font-family: Calibri, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+      margin: 10px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* --- obere Leiste mit Mode + Audio --- */
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .mode-toggle,
+    .audio-btn {
+      padding: 4px 8px;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10px; /* kleinere Schrift */
+      transition: background 0.3s, color 0.3s, opacity 0.3s;
+    }
+
+    .mode-toggle:hover,
+    .audio-btn:hover {
+      opacity: 0.8;
+    }
+
+    .lyrics {
+      max-width: 700px;
+      margin: 0 auto;
+      white-space: pre-line;
+      font-size: 18px;
+	}
+
+    .lyrics-right {
+      max-width: 700px;
+      margin: 0 auto;
+      white-space: pre-line;
+      text-align: right;
+    }
+
+    strong {
+      display: block;
+      text-align: center;
+      margin: 10px 0;
+      line-height: 1.2;
+	}
+
+	.back-btn {
+	  padding: 4px 8px;
+	  background: var(--button-bg);
+	  color: var(--button-text);
+      border: none;
+	  border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px; /* kleinere Schrift */
+      transition: background 0.3s, color 0.3s, opacity 0.3s;
+	  text-decoration: none;
+	}
+
+	.back-btn:hover {
+	  opacity: 0.8;
+	}
+</style>
+</head>
+<body class="dark">
+<div class="top-bar">
+    <a href="../../index.html" class="back-btn">⬅️ Back to Index</a>
+    <button class="mode-toggle" id="modeToggle">☀️ Light Mode</button>
+
+<!-- Audio-Steuerung: sehr kompakt -->
+<audio id="original" src="Robbie Williams - Rudolph.mp3"></audio>
+<audio id="halfplayback" src="Robbie Williams - Rudolph (Karaoke).mp3"></audio>
+
+<audio id="originalslow" src="Robbie Williams - Rudolph - 3 percent slower.mp3"></audio>
+<audio id="halfplaybackslow" src="Robbie Williams - Rudolph (Karaoke, 3 percent slower).mp3"></audio>
+
+
+<span style="color: gray;">| VP:</span>
+    <button class="audio-btn" onclick="playAudio('original')">▶️</button>
+    <button class="audio-btn" onclick="pauseAudio('original')">⏸️</button>
+	<button class="audio-btn" onclick="stopAudio('original')">⏹️</button>
+<span style="color: gray;">| VP slow:</span>
+    <button class="audio-btn" onclick="playAudio('originalslow')">▶️</button>
+    <button class="audio-btn" onclick="pauseAudio('originalslow')">⏸️</button>
+	<button class="audio-btn" onclick="stopAudio('originalslow')">⏹️</button>
+<span style="color: gray;">| HP:</span>
+    <button class="audio-btn" onclick="playAudio('halfplayback')">▶️</button>
+    <button class="audio-btn" onclick="pauseAudio('halfplayback')">⏸️</button>
+	<button class="audio-btn" onclick="stopAudio('halfplayback')">⏹️</button>
+<span style="color: gray;">| HP slow:</span>
+    <button class="audio-btn" onclick="playAudio('halfplaybackslow')">▶️</button>
+    <button class="audio-btn" onclick="pauseAudio('halfplaybackslow')">⏸️</button>
+	<button class="audio-btn" onclick="stopAudio('halfplaybackslow')">⏹️</button>
+</div>
+
+<h1>Rudolph</h1>
+
+<div class="lyrics">
+I box ′em up with a bow
+Then I go pole to pole
+Rudolph, follow your nose (Rudolph, follow your nose)
+To Japan, Isle of Man
+Down to Cannes and Kazakhstan
+Rudy knows where to go (Rudy knows where to go)
+Rudy knows where to go (Rudy knows where to go)
+Through the sky and the snow
+Man, it's 40 below
+Watch me as I go, oh
+
+Hear the Christmas choir chorus
+From the streets below
+Boys and girls that say they saw us
+Dashing through the snow, oh
+
+Oh-oh-oh, oh-oh-oh-oh	Oh-oh-oh, oh-oh-oh-oh
+
+Over the hills and far, far away
+You can be sure that I′m on my way
+
+I meet myself, coming back
+Now I'm going faster than fast
+I go back to the past (I go back to the past)
+Down the flutes, in my boots
+Now I'm covered in soot
+Mrs. Claus will go mad (Mrs. Claus will go mad)
+Mrs. Claus will go mad (Mrs. Claus will go mad)
+I′ll be dealing with that
+But it′s all in the plan
+And she knows I'm the man
+
+Hear the Christmas choir chorus
+From the street below
+Boys and girls that say they saw us
+Dashing through the snow, oh
+
+Over the hills and far, far away
+You can be sure that I′m on my way
+
+Hear the Christmas choir chorus
+From the street below
+Boys and girls that claim they saw us
+Dashing through the snow, oh
+
+Oh-oh-oh, oh-oh-oh-oh	Oh-oh-oh, oh-oh-oh-oh
+
+
+</div>
+
+<script>
+    // --- Titel dynamisch aus h1 übernehmen ---
+    document.addEventListener("DOMContentLoaded", () => {
+      const h1 = document.querySelector("h1");
+      if (h1) document.title = h1.textContent.trim();
+    });
+
+    // Dark-/Light-Mode-Umschalter
+    const toggleBtn = document.getElementById("modeToggle");
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      toggleBtn.textContent = document.body.classList.contains("dark")
+        ? "☀️ Light Mode"
+        : "🌙 Dark Mode";
+    });
+
+    // Audio-Steuerung
+    // --- Audio-Steuerung (mobil sicher) ---
+    function playAudio(id) {
+      const audio = document.getElementById(id);
+      if (!audio) return;
+      // Browser verlangt: .play() nur in direktem User-Event
+      audio.play().catch(err => console.log("Play blockiert:", err));
+    }
+
+    function pauseAudio(id) {
+      const audio = document.getElementById(id);
+      if (audio) audio.pause();
+    }
+
+    function stopAudio(id) {
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+</script>
+</body>
+</html>

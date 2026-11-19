@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title></title> <!-- Wird dynamisch gesetzt -->
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --button-bg: #f0f0f0;
+      --button-text: #000000;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f5f5f5;
+      --button-bg: #333333;
+      --button-text: #ffffff;
+    }
+
+    body {
+      font-family: Calibri, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+      margin: 10px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* --- obere Leiste mit Mode + Audio --- */
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .mode-toggle,
+    .audio-btn {
+      padding: 4px 8px;
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10px; /* kleinere Schrift */
+      transition: background 0.3s, color 0.3s, opacity 0.3s;
+    }
+
+    .mode-toggle:hover,
+    .audio-btn:hover {
+      opacity: 0.8;
+    }
+
+    .lyrics {
+      max-width: 700px;
+      margin: 0 auto;
+      white-space: pre-line;
+      font-size: 18px;
+	}
+
+    .lyrics-right {
+      max-width: 700px;
+      margin: 0 auto;
+      white-space: pre-line;
+      text-align: right;
+    }
+
+    strong {
+      display: block;
+      text-align: center;
+      margin: 10px 0;
+      line-height: 1.2;
+	}
+
+	.back-btn {
+	  padding: 4px 8px;
+	  background: var(--button-bg);
+	  color: var(--button-text);
+      border: none;
+	  border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px; /* kleinere Schrift */
+      transition: background 0.3s, color 0.3s, opacity 0.3s;
+	  text-decoration: none;
+	}
+
+	.back-btn:hover {
+	  opacity: 0.8;
+	}
+</style>
+</head>
+<body class="dark">
+<div class="top-bar">
+    <a href="../../index.html" class="back-btn">⬅️ Back to Index</a>
+    <button class="mode-toggle" id="modeToggle">☀️ Light Mode</button>
+
+<!-- Audio-Steuerung: sehr kompakt -->
+<audio id="original" src="Wincent Weiss - Schenk Mir Zeit.mp3"></audio>
+<audio id="halfplayback" src="Wincent Weiss - Schenk Mir Zeit (Karaoke).mp3"></audio>
+
+<span style="color: gray;">| VP:</span>
+    <button class="audio-btn" onclick="playAudio('original')">▶️</button>
+    <button class="audio-btn" onclick="pauseAudio('original')">⏸️</button>
+	<button class="audio-btn" onclick="stopAudio('original')">⏹️</button>
+<span style="color: gray;">| HP:</span>
+    <button class="audio-btn" onclick="playAudio('halfplayback')">▶️</button>
+    <button class="audio-btn" onclick="pauseAudio('halfplayback')">⏸️</button>
+	<button class="audio-btn" onclick="stopAudio('halfplayback')">⏹️</button>
+</div>
+
+<h1>Beste Zeit im Jahr</h1>
+
+<div class="lyrics">
+'Ne Woche fünf Sterne Hotel
+Am anderen Ende der Welt
+Wo man zum Frühstück Champagner bestellt
+Klingt doch ganz schön eigentlich
+Doch das wünsch' ich mir nicht
+
+Ein knallroter Caddy vorm Haus
+Weißes Leder ey mein Kindheitstraum
+Klar so ein Wagen wär' sicher ganz schick
+Hmm doch das wünsch' ich mir nicht
+
+Da gibt es nur eins das ich will
+Und das kannst nur du mir erfüllen
+
+<span style="display:inline-block;margin-left:20px;">Schenk mir Zeit mit dir
+Auf meinem Wunschzettel steht dieses Jahr gar nicht viel
+Nur Zeit mit dir
+Die besten Geschenke kommen ohne Papier
+Erinnerungen die wir uns teilen
+Ich rahm' sie mir alle gut ein
+Denn das ist was mir wirklich bleibt
+Schenk mir Zeit</span>
+
+Ein Haus irgendwo auf dem Land
+Mit Seeblick und allem drum und dran
+Da wo man am Wochenende entspannt
+Wär' ja ganz schön sicherlich
+Doch das wünsch' ich mir nicht
+
+Das alles bedeutet mir nichts
+Solange du nicht bei mir bist
+Aber einen ganzen Tag nur du und ich
+Hmm mehr wünsch' ich mir nicht
+
+Da gibt es nur eins das ich will
+Und das kannst nur du mir erfüllen
+
+<span style="display:inline-block;margin-left:20px;">Schenk mir Zeit mit dir
+Auf meinem Wunschzettel steht dieses Jahr gar nicht viel
+Nur Zeit mit dir
+Die besten Geschenke kommen ohne Papier
+Erinnerungen die wir uns teilen
+Ich rahm' sie mir alle gut ein
+Denn das ist was mir wirklich bleibt
+Schenk mir Zeit</span>
+
+
+</div>
+
+<script>
+    // --- Titel dynamisch aus h1 übernehmen ---
+    document.addEventListener("DOMContentLoaded", () => {
+      const h1 = document.querySelector("h1");
+      if (h1) document.title = h1.textContent.trim();
+    });
+
+    // Dark-/Light-Mode-Umschalter
+    const toggleBtn = document.getElementById("modeToggle");
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      toggleBtn.textContent = document.body.classList.contains("dark")
+        ? "☀️ Light Mode"
+        : "🌙 Dark Mode";
+    });
+
+    // Audio-Steuerung
+    // --- Audio-Steuerung (mobil sicher) ---
+    function playAudio(id) {
+      const audio = document.getElementById(id);
+      if (!audio) return;
+      // Browser verlangt: .play() nur in direktem User-Event
+      audio.play().catch(err => console.log("Play blockiert:", err));
+    }
+
+    function pauseAudio(id) {
+      const audio = document.getElementById(id);
+      if (audio) audio.pause();
+    }
+
+    function stopAudio(id) {
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+</script>
+</body>
+</html>
