@@ -133,6 +133,17 @@ h1 {
   text-align: center;
 }
 
+.player-shell .song-meta {
+  width: 100%;
+  text-align: center;
+}
+
+.player-shell .song-title {
+  width: 100%;
+  padding-right: 0;
+  text-align: center;
+}
+
 .song-number {
   position: absolute;
   top: 12px;
