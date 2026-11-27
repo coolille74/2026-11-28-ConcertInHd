@@ -33,6 +33,7 @@
       <li><a class="song-tile color-4"><span class="song-number">16+17</span><span class="song-title">1000 Sterne sind ein Dom<br>Sind die Lichter angezündet</span></a></li>
     </ol>
 
+    <button id="stop-playing" class="stop-playing" type="button" hidden>[STOP PLAYING]</button>
     <p id="audio-status" role="status" aria-live="polite" class="site-footer"></p>
 
     <footer>
@@ -45,16 +46,68 @@
   <script>
   const tiles = document.querySelectorAll(".song-tile[data-sound]");
   const audioStatus = document.getElementById("audio-status");
+  const stopButton = document.getElementById("stop-playing");
   let currentAudio = null;
   let activeTile = null;
   let tileAnimation = null;
+  const tileStartBounds = new WeakMap();
+  const deactivatingTiles = new Set();
 
-  function clearTile(tile, animation) {
+  function clearTile(tile, animation, shell) {
     if (animation) animation.cancel();
-    tile.classList.remove("active");
+
+    if (!animation) {
+      const start = tileStartBounds.get(tile);
+      if (start) {
+        tile.style.position = "fixed";
+        tile.style.left = `${start.left}px`;
+        tile.style.top = `${start.top}px`;
+        tile.style.width = `${start.width}px`;
+        tile.style.height = `${start.height}px`;
+      }
+    }
+
+    tile.classList.remove("active", "text-zoomed");
     ["position", "left", "top", "width", "height", "margin", "transform"].forEach(property => {
       tile.style.removeProperty(property);
     });
+    if (tile.parentElement) tile.parentElement.style.removeProperty("min-height");
+    tileStartBounds.delete(tile);
+    deactivatingTiles.delete(tile);
+    if (shell && deactivatingTiles.size === 0) shell.classList.remove("is-deactivating");
+  }
+
+  function shrinkTileText(tile, onComplete) {
+    const textElements = Array.from(tile.querySelectorAll(".song-number, .song-title, .song-meta"));
+    if (!tile.classList.contains("text-zoomed") || textElements.length === 0) {
+      tile.classList.remove("text-zoomed");
+      onComplete();
+      return;
+    }
+
+    const pendingTransitions = new Set(textElements);
+    let transitionTimeout;
+    const finish = () => {
+      window.clearTimeout(transitionTimeout);
+      textElements.forEach(element => element.removeEventListener("transitionend", onTransitionEnd));
+      onComplete();
+    };
+    const onTransitionEnd = event => {
+      if (event.propertyName !== "font-size") return;
+      pendingTransitions.delete(event.currentTarget);
+      if (pendingTransitions.size === 0) finish();
+    };
+
+    textElements.forEach(element => element.addEventListener("transitionend", onTransitionEnd));
+    tile.classList.remove("text-zoomed");
+    transitionTimeout = window.setTimeout(finish, 280);
+  }
+
+  function coverViewport(tile) {
+    tile.style.left = "0px";
+    tile.style.top = "0px";
+    tile.style.width = `${window.innerWidth}px`;
+    tile.style.height = `${window.innerHeight}px`;
   }
 
   function restoreActiveTile() {
@@ -62,19 +115,41 @@
 
     const tile = activeTile;
     const animation = tileAnimation;
+    const shell = tile.closest(".player-shell");
     activeTile = null;
     tileAnimation = null;
+    stopButton.hidden = true;
+    deactivatingTiles.add(tile);
+    if (shell) shell.classList.add("is-deactivating");
 
-    if (animation) {
-      animation.onfinish = () => clearTile(tile, animation);
-      animation.reverse();
-    } else {
-      clearTile(tile);
+    shrinkTileText(tile, () => {
+      if (animation) {
+        animation.onfinish = () => clearTile(tile, animation, shell);
+        animation.reverse();
+      } else {
+        clearTile(tile, null, shell);
+      }
+    });
+  }
+
+  function stopActivePlayback() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
     }
+    restoreActiveTile();
   }
 
   function expandTile(tile) {
     const start = tile.getBoundingClientRect();
+    const layoutSlot = tile.parentElement;
+    tileStartBounds.set(tile, {
+      left: start.left,
+      top: start.top,
+      width: start.width,
+      height: start.height
+    });
+    if (layoutSlot) layoutSlot.style.minHeight = `${layoutSlot.getBoundingClientRect().height}px`;
     tile.style.position = "fixed";
     tile.style.left = `${start.left}px`;
     tile.style.top = `${start.top}px`;
@@ -85,13 +160,11 @@
     tile.classList.add("active");
     void tile.offsetWidth;
 
-    const width = Math.min(window.innerWidth * 0.96, 1250);
-    const height = Math.min(window.innerHeight * 0.88, 800);
     const end = {
-      left: (window.innerWidth - width) / 2,
-      top: (window.innerHeight - height) / 2,
-      width,
-      height
+      left: 0,
+      top: 0,
+      width: window.innerWidth,
+      height: window.innerHeight
     };
 
     if (typeof tile.animate !== "function") {
@@ -101,7 +174,7 @@
       return null;
     }
 
-    return tile.animate([
+    const animation = tile.animate([
       { left: `${start.left}px`, top: `${start.top}px`, width: `${start.width}px`, height: `${start.height}px` },
       { left: `${end.left}px`, top: `${end.top}px`, width: `${end.width}px`, height: `${end.height}px` }
     ], {
@@ -109,6 +182,10 @@
       easing: "ease-in-out",
       fill: "both"
     });
+    animation.onfinish = () => {
+      if (activeTile === tile && tileAnimation === animation) tile.classList.add("text-zoomed");
+    };
+    return animation;
   }
 
   tiles.forEach(tile => {
@@ -116,7 +193,7 @@
       event.preventDefault();
       event.stopPropagation();
 
-      if (activeTile === tile) return;
+      if (activeTile === tile || deactivatingTiles.has(tile)) return;
 
       if (currentAudio) {
         currentAudio.pause();
@@ -124,8 +201,10 @@
       }
       restoreActiveTile();
 
-      tileAnimation = expandTile(tile);
       activeTile = tile;
+      tileAnimation = expandTile(tile);
+      if (!tileAnimation) tile.classList.add("text-zoomed");
+      stopButton.hidden = false;
 
       const audio = new Audio(tile.dataset.sound);
       currentAudio = audio;
@@ -153,15 +232,26 @@
     });
   });
 
-  // Klick neben dem aktiven Tile stoppt die Wiedergabe und klappt es ein.
   document.addEventListener("click", () => {
-    if (activeTile) {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-      }
-      restoreActiveTile();
+    if (activeTile) stopActivePlayback();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && activeTile) stopActivePlayback();
+  });
+
+  stopButton.addEventListener("click", event => {
+    event.stopPropagation();
+    if (activeTile) stopActivePlayback();
+  });
+
+  window.addEventListener("resize", () => {
+    if (!activeTile) return;
+    if (tileAnimation) {
+      tileAnimation.cancel();
+      tileAnimation = null;
     }
+    coverViewport(activeTile);
   });
   </script>
 

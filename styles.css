@@ -111,7 +111,7 @@ h1 {
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  transition: transform .3s ease, filter .15s ease, box-shadow .3s ease, font-size .35s ease;
+  transition: transform .3s ease, filter .15s ease, box-shadow .3s ease, font-size .22s cubic-bezier(.42, 0, .58, 1);
 }
 
 .song-tile:hover {
@@ -119,6 +119,14 @@ h1 {
   transform: scale(1.08);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
   opacity: 0.9;
+}
+
+.player-shell.is-deactivating .song-tile:hover {
+  filter: none;
+  transform: none;
+  box-shadow: 0 8px 20px #0005;
+  opacity: 1;
+  transition: none;
 }
 
 .song-tile.active {
@@ -129,8 +137,72 @@ h1 {
   box-shadow: 0 0 50px rgba(0, 0, 0, .7);
 }
 
+.player-shell .song-tile.active {
+  border-radius: 0;
+  isolation: isolate;
+}
+
+.player-shell .song-tile.active::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url("images/Flyer1_Quer.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  content: "";
+  opacity: .3;
+  pointer-events: none;
+}
+
+.stop-playing {
+  position: fixed;
+  bottom: clamp(12px, 3vh, 28px);
+  left: 50vw;
+  z-index: 10000;
+  padding: 8px 12px;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #ffffffb8;
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  opacity: .75;
+  cursor: pointer;
+}
+
+.stop-playing:hover {
+  filter: brightness(1.2);
+  opacity: 1;
+}
+
+.stop-playing[hidden] {
+  display: none;
+}
+
 .player-shell .song-tile {
   text-align: center;
+}
+
+.player-shell .song-tile .song-number,
+.player-shell .song-tile .song-title,
+.player-shell .song-tile .song-meta {
+  transition: font-size .22s cubic-bezier(.42, 0, .58, 1);
+}
+
+.player-shell .song-tile.text-zoomed .song-number {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+.player-shell .song-tile.text-zoomed .song-title {
+  font-size: clamp(2rem, 6vw, 4rem);
+}
+
+.player-shell .song-tile.text-zoomed .song-meta {
+  font-size: clamp(1.25rem, 3vw, 2rem);
 }
 
 .player-shell .song-meta {
